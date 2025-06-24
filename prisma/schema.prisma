@@ -1,0 +1,269 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------
+// Core Multi-Tenancy Models (Shared across all tenants)
+// -----------------------------------------------------------
+model Tenant {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  subdomain    String?  @unique
+  email        String   @unique
+  phone        String?
+  address      String?
+  logo         String?
+  languages    String[] @default(["en"])
+  maxStudents  Int      @default(25)
+  subscription String   @default("free")
+  timezone     String   @default("Asia/Colombo")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  users           User[]
+  staff           Staff[]           // Added missing relation
+  students        Student[]
+  classes         Class[]
+  attendances     Attendance[]
+  fees            Fee[]
+  communications  Communication[]   // Added missing relation
+  reports         Report[]          // Added missing relation
+  timetables      Timetable[]       // Added missing relation
+  payrolls        Payroll[]         // Added missing relation
+
+  @@map("tenants")
+}
+
+// Global User model (linked to a specific tenant)
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole
+  isActive  Boolean  @default(true)
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenant          Tenant          @relation(fields: [tenantId], references: [id])
+  staff           Staff?          // Added missing relation (one-to-one)
+  communications  Communication[] // Added missing relation
+
+  @@map("users")
+}
+
+enum UserRole {
+  SYS_ADMIN
+  SCHOOL_ADMIN
+  TEACHER
+  PARENT
+  STUDENT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum FeeStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// -----------------------------------------------------------
+// Tenant-Specific Models (All include tenantId)
+// -----------------------------------------------------------
+model Student {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  isActive  Boolean  @default(true)
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+  attendances   Attendance[]
+  fees          Fee[]
+  classStudents ClassStudent[] // Added missing relation
+
+  @@map("students")
+}
+
+model Staff {
+  id         String   @id @default(uuid())
+  userId     String   @unique // Link to the User who is the staff member
+  user       User     @relation(fields: [userId], references: [id])
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  staffId    String
+  position   String
+  department String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  attendances Attendance[]
+  classes     Class[]   // Teacher leads classes
+  payrolls    Payroll[] // Fixed relation name
+
+  @@unique([staffId, tenantId], map: "staff_id_unique_per_tenant")
+  @@index([tenantId])
+}
+
+model Class {
+  id        String   @id @default(cuid())
+  name      String
+  grade     String?
+  section   String?
+  isActive  Boolean  @default(true)
+  tenantId  String
+  teacherId String?  // Added teacher relation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+  teacher       Staff?        @relation(fields: [teacherId], references: [id]) // Added missing relation
+  attendances   Attendance[]
+  classStudents ClassStudent[] // Added missing relation
+
+  @@map("classes")
+}
+
+model ClassStudent {
+  id        String   @id @default(uuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id])
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  tenantId  String // Redundant but good for isolation if querying ClassStudent directly
+  createdAt DateTime @default(now())
+
+  @@unique([classId, studentId]) // A student can only be in a class once
+  @@index([tenantId])
+}
+
+model Attendance {
+  id        String          @id @default(cuid())
+  date      String          // Format: YYYY-MM-DD
+  status    AttendanceStatus
+  studentId String?         // Made optional since staff can also have attendance
+  staffId   String?         // Added staff attendance relation
+  classId   String?
+  tenantId  String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  // Relations
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  student Student? @relation(fields: [studentId], references: [id]) // Made optional
+  staff   Staff?   @relation(fields: [staffId], references: [id])   // Added missing relation
+  class   Class?   @relation(fields: [classId], references: [id])
+
+  @@unique([studentId, date])
+  @@map("attendances")
+}
+
+model Communication {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  type      String // e.g., 'Announcement', 'Notice'
+  audience  String[] // e.g., ['ALL', 'STUDENTS', 'PARENTS', 'TEACHERS', 'Grade-5A']
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  senderId  String // User ID of who sent it
+  sender    User     @relation(fields: [senderId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Fee {
+  id          String    @id @default(cuid())
+  amount      Float
+  description String?
+  status      FeeStatus @default(PENDING)
+  dueDate     DateTime
+  paidDate    DateTime?
+  studentId   String
+  tenantId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@map("fees")
+}
+
+// Placeholders for future modules
+model Report {
+  id        String   @id @default(uuid())
+  name      String
+  type      String
+  data      Json // Store report data as JSON
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Timetable {
+  id        String   @id @default(uuid())
+  name      String // e.g., "Term 1 Timetable"
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  // More specific timetable data (e.g., period, subject, class, teacher) would be in related models or JSON field
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Payroll {
+  id        String   @id @default(uuid())
+  staffId   String
+  staff     Staff    @relation(fields: [staffId], references: [id])
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  month     String
+  year      Int
+  amount    Float
+  // Add other payroll specific fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([staffId, month, year])
+  @@index([tenantId])
+}
