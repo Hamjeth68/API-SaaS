@@ -14,17 +14,27 @@ export class UsersService {
     return result;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        password: hashedPassword,
-        isActive: createUserDto.isActive ?? true,
-      },
-    });
-    return this.mapToDto(user);
+// users.service.ts
+async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+  // Check if tenant exists
+  const tenant = await this.prisma.tenant.findUnique({
+    where: { id: createUserDto.tenantId },
+  });
+
+  if (!tenant) {
+    throw new NotFoundException(`Tenant with ID ${createUserDto.tenantId} not found`);
   }
+
+  const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+  const user = await this.prisma.user.create({
+    data: {
+      ...createUserDto,
+      password: hashedPassword,
+      isActive: createUserDto.isActive ?? true,
+    },
+  });
+  return this.mapToDto(user);
+}
 
   async findAll(tenantId: string): Promise<UserResponseDto[]> {
     const users = await this.prisma.user.findMany({
