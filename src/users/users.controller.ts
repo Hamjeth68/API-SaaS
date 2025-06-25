@@ -136,7 +136,8 @@ export class UsersController {
       'application/json': {
         example: {
           statusCode: 404,
-          message: 'Tenant with ID 123e4567-e89b-12d3-a456-426614174000 not found',
+          message:
+            'Tenant with ID 123e4567-e89b-12d3-a456-426614174000 not found',
           error: 'Not Found',
         },
       },
@@ -169,7 +170,9 @@ export class UsersController {
   @ApiForbiddenResponse({
     description: 'Forbidden - User does not have required role',
   })
-  async findAll(@Query('tenantId') tenantId: string): Promise<UserResponseDto[]> {
+  async findAll(
+    @Query('tenantId') tenantId: string,
+  ): Promise<UserResponseDto[]> {
     return this.usersService.findAll(tenantId);
   }
 
@@ -178,7 +181,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get user by ID',
-    description: 'Retrieves a single user by their ID. Requires admin privileges.',
+    description:
+      'Retrieves a single user by their ID. Requires admin privileges.',
   })
   @ApiParam({
     name: 'id',
@@ -337,7 +341,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Activate user',
-    description: 'Activates a deactivated user account. Requires admin privileges.',
+    description:
+      'Activates a deactivated user account. Requires admin privileges.',
   })
   @ApiParam({
     name: 'id',

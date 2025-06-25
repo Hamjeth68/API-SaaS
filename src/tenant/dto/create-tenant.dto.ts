@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsOptional, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateTenantDto {
   @ApiProperty({
@@ -32,8 +38,6 @@ export class CreateTenantDto {
   @IsEmail()
   email: string;
 
-
-  
   @IsOptional()
   @IsString()
   phone?: string;

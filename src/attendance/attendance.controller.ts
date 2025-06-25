@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -54,7 +64,10 @@ export class AttendanceController {
   @Patch(':id')
   @Roles(UserRole.TEACHER)
   @ApiOperation({ summary: 'Update attendance record' })
-  update(@Param('id') id: string, @Body() updateAttendanceDto: UpdateAttendanceDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAttendanceDto: UpdateAttendanceDto,
+  ) {
     return this.attendanceService.update(id, updateAttendanceDto);
   }
 

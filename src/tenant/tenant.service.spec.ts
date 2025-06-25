@@ -35,7 +35,9 @@ describe('TenantService', () => {
       const expected = { ...dto, isActive: true };
       prisma.tenant.create.mockResolvedValue(expected);
       await expect(service.create(dto as any)).resolves.toEqual(expected);
-      expect(prisma.tenant.create).toHaveBeenCalledWith({ data: { ...dto, isActive: true } });
+      expect(prisma.tenant.create).toHaveBeenCalledWith({
+        data: { ...dto, isActive: true },
+      });
     });
   });
 
@@ -66,7 +68,10 @@ describe('TenantService', () => {
       const updated = { id: '1', ...dto };
       prisma.tenant.update.mockResolvedValue(updated);
       await expect(service.update('1', dto as any)).resolves.toEqual(updated);
-      expect(prisma.tenant.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
+      expect(prisma.tenant.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: dto,
+      });
     });
   });
 
@@ -83,8 +88,12 @@ describe('TenantService', () => {
     it('should return a tenant by slug', async () => {
       const tenant = { id: '1', slug: 'tenant-1' };
       prisma.tenant.findUnique.mockResolvedValue(tenant);
-      await expect(service.getTenantBySlug('tenant-1')).resolves.toEqual(tenant);
-      expect(prisma.tenant.findUnique).toHaveBeenCalledWith({ where: { slug: 'tenant-1' } });
+      await expect(service.getTenantBySlug('tenant-1')).resolves.toEqual(
+        tenant,
+      );
+      expect(prisma.tenant.findUnique).toHaveBeenCalledWith({
+        where: { slug: 'tenant-1' },
+      });
     });
   });
 });

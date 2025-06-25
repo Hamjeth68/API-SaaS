@@ -4,7 +4,6 @@ import { BulkAttendanceDto } from './dto/bulk-attendance.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 
-
 @Injectable()
 export class AttendanceService {
   constructor(private prisma: PrismaService) {}

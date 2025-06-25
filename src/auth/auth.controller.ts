@@ -29,7 +29,6 @@ import { UserResponseDto } from '../users/dto/user-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginResponseDto } from './dto/login-response.dto';
 
-
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -190,7 +189,8 @@ export class AuthController {
       'application/json': {
         example: {
           statusCode: 404,
-          message: 'Tenant with ID 123e4567-e89b-12d3-a456-426614174000 not found',
+          message:
+            'Tenant with ID 123e4567-e89b-12d3-a456-426614174000 not found',
           error: 'Not Found',
         },
       },
@@ -199,7 +199,4 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
-
-
-
 }

@@ -1,6 +1,24 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UserRole } from 'generated/prisma';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -28,7 +46,12 @@ export class StudentsController {
   @Get()
   @Roles(UserRole.SCHOOL_ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: 'Get all students for a tenant' })
-  @ApiQuery({ name: 'tenantId', required: true, type: String, description: 'Tenant ID' })
+  @ApiQuery({
+    name: 'tenantId',
+    required: true,
+    type: String,
+    description: 'Tenant ID',
+  })
   @ApiResponse({ status: 200, description: 'List of students.' })
   findAll(@Query('tenantId') tenantId: string) {
     return this.studentsService.findAll(tenantId);
@@ -37,7 +60,12 @@ export class StudentsController {
   @Get(':id')
   @Roles(UserRole.SCHOOL_ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: 'Get a student by ID' })
-  @ApiParam({ name: 'id', required: true, type: String, description: 'Student ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: String,
+    description: 'Student ID',
+  })
   @ApiResponse({ status: 200, description: 'Student found.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
   findOne(@Param('id') id: string) {
@@ -47,7 +75,12 @@ export class StudentsController {
   @Patch(':id')
   @Roles(UserRole.SCHOOL_ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: 'Update a student' })
-  @ApiParam({ name: 'id', required: true, type: String, description: 'Student ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: String,
+    description: 'Student ID',
+  })
   @ApiBody({ type: UpdateStudentDto })
   @ApiResponse({ status: 200, description: 'Student updated successfully.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
@@ -58,7 +91,12 @@ export class StudentsController {
   @Delete(':id')
   @Roles(UserRole.SCHOOL_ADMIN)
   @ApiOperation({ summary: 'Delete a student' })
-  @ApiParam({ name: 'id', required: true, type: String, description: 'Student ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    type: String,
+    description: 'Student ID',
+  })
   @ApiResponse({ status: 200, description: 'Student deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Student not found.' })
   remove(@Param('id') id: string) {

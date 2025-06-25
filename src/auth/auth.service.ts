@@ -1,4 +1,10 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
@@ -28,7 +34,9 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     // Find user by email
-    const user = await this.prisma.user.findUnique({ where: { email: loginDto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: loginDto.email },
+    });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -89,13 +97,15 @@ export class AuthService {
   //     },
   //   });
   // }
-    async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: registerDto.tenantId },
     });
 
     if (!tenant) {
-      throw new NotFoundException(`Tenant with ID ${registerDto.tenantId} not found`);
+      throw new NotFoundException(
+        `Tenant with ID ${registerDto.tenantId} not found`,
+      );
     }
 
     const existingUser = await this.prisma.user.findUnique({
@@ -108,9 +118,9 @@ export class AuthService {
 
     const user = await createUserWithHashedPassword(this.prisma, {
       ...registerDto,
-      isActive: true // Force active for registration
+      isActive: true, // Force active for registration
     });
-    
+
     const { password, ...result } = user;
     return result;
   }

@@ -13,7 +13,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         (req) => req?.cookies?.access_token,
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') ?? (() => { throw new Error('JWT_SECRET is not defined'); })(),
+      secretOrKey:
+        configService.get<string>('JWT_SECRET') ??
+        (() => {
+          throw new Error('JWT_SECRET is not defined');
+        })(),
     });
   }
 

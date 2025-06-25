@@ -81,7 +81,10 @@ describe('ClassesService', () => {
       const updated = { id: '1', ...dto };
       prisma.class.update.mockResolvedValue(updated);
       await expect(service.update('1', dto as any)).resolves.toEqual(updated);
-      expect(prisma.class.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
+      expect(prisma.class.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: dto,
+      });
     });
   });
 

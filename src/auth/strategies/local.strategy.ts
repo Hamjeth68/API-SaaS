@@ -7,12 +7,18 @@ import { Strategy } from 'passport-jwt';
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
-        jwtFromRequest: (req) => {
-            const token = req?.cookies?.access_token || req?.headers?.authorization?.split(' ')[1];
-            return token;
-        },
-        ignoreExpiration: false,
-        secretOrKey: process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET is not defined'); })(),
+      jwtFromRequest: (req) => {
+        const token =
+          req?.cookies?.access_token ||
+          req?.headers?.authorization?.split(' ')[1];
+        return token;
+      },
+      ignoreExpiration: false,
+      secretOrKey:
+        process.env.JWT_SECRET ||
+        (() => {
+          throw new Error('JWT_SECRET is not defined');
+        })(),
     });
   }
 

@@ -44,7 +44,9 @@ describe('StudentsService', () => {
       const result = [{ id: '1', tenantId: 'tenant1' }];
       prisma.student.findMany.mockResolvedValue(result);
       await expect(service.findAll('tenant1')).resolves.toEqual(result);
-      expect(prisma.student.findMany).toHaveBeenCalledWith({ where: { tenantId: 'tenant1' } });
+      expect(prisma.student.findMany).toHaveBeenCalledWith({
+        where: { tenantId: 'tenant1' },
+      });
     });
   });
 
@@ -74,7 +76,10 @@ describe('StudentsService', () => {
       const updated = { id: '1', ...dto };
       prisma.student.update.mockResolvedValue(updated);
       await expect(service.update('1', dto as any)).resolves.toEqual(updated);
-      expect(prisma.student.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
+      expect(prisma.student.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: dto,
+      });
     });
   });
 
@@ -83,7 +88,9 @@ describe('StudentsService', () => {
       const deleted = { id: '1' };
       prisma.student.delete.mockResolvedValue(deleted);
       await expect(service.remove('1')).resolves.toEqual(deleted);
-      expect(prisma.student.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prisma.student.delete).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
   });
 });

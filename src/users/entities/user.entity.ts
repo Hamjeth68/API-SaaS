@@ -1,4 +1,4 @@
-import { UserRole } from "generated/prisma";
+import { UserRole } from 'generated/prisma';
 
 export class UserEntity {
   id: string;

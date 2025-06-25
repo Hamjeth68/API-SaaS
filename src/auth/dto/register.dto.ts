@@ -1,4 +1,11 @@
-import { IsEmail, IsString, MinLength, IsEnum, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  IsEnum,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 import { UserRole } from 'generated/prisma';
 
 export class RegisterDto {
@@ -16,7 +23,6 @@ export class RegisterDto {
   @IsBoolean()
   isActive?: boolean;
 
-  
   @IsString()
   lastName: string;
 
