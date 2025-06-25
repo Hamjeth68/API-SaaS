@@ -13,7 +13,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { UserRole } from 'generated/prisma';
 import { createUserWithHashedPassword } from 'src/shared/user-creation.helper';
-
+/**
+ * TODO: Hamjeth - Fix the JWT token issue here, I have removed the decorators and guards only here instead of commenting
+ * following all the JWT decorators and guards in every controller is commented out
+ * because the JWT token is not being sent in the request headers.
+ * This is likely due to the fact that the JWT token is not being sent in the request headers.
+ * but we are trying it in swagger and still getting 401 Unauthorized
+ */
 @Injectable()
 export class AuthService {
   constructor(

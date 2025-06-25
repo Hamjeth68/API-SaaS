@@ -39,8 +39,8 @@ import { LoginResponseDto } from './dto/login-response.dto';
  * TODO: Hamjeth - Fix the JWT token issue here
  *
  */
-// @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
