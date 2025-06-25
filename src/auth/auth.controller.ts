@@ -30,6 +30,17 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginResponseDto } from './dto/login-response.dto';
 
 @ApiTags('Authentication')
+/**
+ *  When ApiBearerAuth & UseGuards(JwtAuthGuard) is applied the response seems to be a 401 Unauthorized
+ *  even when the request is valid. 
+ * This is likely due to the fact that the JWT token is not being sent in the request headers.
+ * but we are trying it in swagger and still getting 401 Unauthorized
+ *
+ * TODO: Hamjeth - Fix the JWT token issue here
+ *
+ */
+// @ApiBearerAuth()
+// @UseGuards(JwtAuthGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

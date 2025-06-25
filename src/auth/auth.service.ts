@@ -63,6 +63,13 @@ export class AuthService {
     };
   }
 
+
+  /**
+   * we are not allowing self-registration as SYS_ADMIN or SCHOOL_ADMIN 
+   *  because these roles should be created by an existing admin user.
+   *  so we using createUserWithHashedPassword method  which is a helper function with the same logic 
+   *  to create a user with a hashed password. 
+   */
   // async register(registerDto: RegisterDto) {
   //   // 1. Check if tenant exists
   //   const tenant = await this.prisma.tenant.findUnique({
@@ -97,6 +104,22 @@ export class AuthService {
   //     },
   //   });
   // }
+
+  /**
+   * 
+   * @param registerDto 
+   * @returns 
+   * This method registers a new user with a hashed password.
+   * It checks if the tenant exists, ensures the email is unique,
+   * and creates the user with the provided details.
+   * 
+    * Note: This method forces the user to be active upon registration.
+    * It does not allow self-registration as SYS_ADMIN or SCHOOL_ADMIN.
+    * It uses the createUserWithHashedPassword helper function
+    * to handle combining the logic of user creation and password hashing.
+    * 
+   */
+
   async register(registerDto: RegisterDto) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: registerDto.tenantId },
