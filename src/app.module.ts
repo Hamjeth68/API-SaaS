@@ -5,6 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { TenantModule } from './tenant/tenant.module';
+import { UsersModule } from './users/users.module';
+import { StudentsModule } from './students/students.module';
+import { StaffModule } from './staff/staff.module';
+import { ClassesModule } from './classes/classes.module';
 
 @Module({
   imports: [
@@ -14,7 +18,12 @@ import { TenantModule } from './tenant/tenant.module';
     }),
       PrismaModule,
       AuthModule,
-      TenantModule
+      TenantModule,
+      UsersModule,
+      StudentsModule,
+      StaffModule,
+      ClassesModule, 
+
   ],
   controllers: [AppController],
   providers: [AppService],
