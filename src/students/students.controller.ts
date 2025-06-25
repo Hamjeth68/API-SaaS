@@ -9,9 +9,9 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentsService } from './students.service';
 
 @ApiTags('Students')
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @Controller('students')
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 

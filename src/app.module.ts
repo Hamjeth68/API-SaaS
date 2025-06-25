@@ -9,6 +9,14 @@ import { UsersModule } from './users/users.module';
 import { StudentsModule } from './students/students.module';
 import { StaffModule } from './staff/staff.module';
 import { ClassesModule } from './classes/classes.module';
+import { AuthController } from './auth/auth.controller';
+import { ClassesController } from './classes/classes.controller';
+import { StaffController } from './staff/staff.controller';
+import { StudentsController } from './students/students.controller';
+import { TenantController } from './tenant/tenant.controller';
+import { UsersController } from './users/users.controller';
+import { AttendanceModule } from './attendance/attendance.module';
+import { CommunicationsModule } from './communications/communications.module';
 
 @Module({
   imports: [
@@ -22,10 +30,11 @@ import { ClassesModule } from './classes/classes.module';
       UsersModule,
       StudentsModule,
       StaffModule,
-      ClassesModule, 
-
+      ClassesModule,
+      AttendanceModule,
+      CommunicationsModule, 
   ],
-  controllers: [AppController],
+  controllers: [AppController, AuthController, TenantController, UsersController, StudentsController, StaffController, ClassesController],
   providers: [AppService],
 })
 export class AppModule {}

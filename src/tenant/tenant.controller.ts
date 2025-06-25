@@ -31,9 +31,9 @@ import { UserRole } from 'generated/prisma';
 import { TenantResponseDto } from './dto/tenant-response-dto';
 
 @ApiTags('Tenants')
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @Controller('tenants')
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 

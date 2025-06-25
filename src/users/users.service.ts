@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from './dto/user-response.dto';
+import { createUserWithHashedPassword } from 'src/shared/user-creation.helper';
 
 @Injectable()
 export class UsersService {
@@ -15,26 +16,18 @@ export class UsersService {
   }
 
 // users.service.ts
-async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-  // Check if tenant exists
-  const tenant = await this.prisma.tenant.findUnique({
-    where: { id: createUserDto.tenantId },
-  });
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: createUserDto.tenantId },
+    });
 
-  if (!tenant) {
-    throw new NotFoundException(`Tenant with ID ${createUserDto.tenantId} not found`);
+    if (!tenant) {
+      throw new NotFoundException(`Tenant with ID ${createUserDto.tenantId} not found`);
+    }
+
+    const user = await createUserWithHashedPassword(this.prisma, createUserDto);
+    return this.mapToDto(user);
   }
-
-  const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-  const user = await this.prisma.user.create({
-    data: {
-      ...createUserDto,
-      password: hashedPassword,
-      isActive: createUserDto.isActive ?? true,
-    },
-  });
-  return this.mapToDto(user);
-}
 
   async findAll(tenantId: string): Promise<UserResponseDto[]> {
     const users = await this.prisma.user.findMany({
