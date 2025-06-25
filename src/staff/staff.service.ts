@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { CreateStaffDto } from './dto/create-staff.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class StaffService {
@@ -11,7 +12,7 @@ export class StaffService {
     return this.prisma.staff.create({
       data: {
         ...createStaffDto,
-        staffId: `STAFF-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+        staffId: `STAFF-${uuidv4().replace(/-/g, '').substring(0, 16).toUpperCase()}`,
       },
     });
   }
