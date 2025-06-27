@@ -17,6 +17,7 @@ import { TenantController } from './tenant/tenant.controller';
 import { UsersController } from './users/users.controller';
 import { AttendanceModule } from './attendance/attendance.module';
 import { CommunicationsModule } from './communications/communications.module';
+import { FeesModule } from './fees/fees.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CommunicationsModule } from './communications/communications.module';
     ClassesModule,
     AttendanceModule,
     CommunicationsModule,
+    FeesModule,
   ],
   controllers: [
     AppController,
