@@ -25,4 +25,3 @@ export class CreateStudentDto {
   @IsString()
   tenantId: string;
 }
-

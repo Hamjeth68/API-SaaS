@@ -15,14 +15,16 @@ export class UsersService {
     return result;
   }
 
-// users.service.ts
+  // users.service.ts
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: createUserDto.tenantId },
     });
 
     if (!tenant) {
-      throw new NotFoundException(`Tenant with ID ${createUserDto.tenantId} not found`);
+      throw new NotFoundException(
+        `Tenant with ID ${createUserDto.tenantId} not found`,
+      );
     }
 
     const user = await createUserWithHashedPassword(this.prisma, createUserDto);
@@ -54,9 +56,12 @@ export class UsersService {
     });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
-    let data: any = { ...updateUserDto };
-    
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const data: any = { ...updateUserDto };
+
     if (updateUserDto.password) {
       data.password = await bcrypt.hash(updateUserDto.password, 10);
     }

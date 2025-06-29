@@ -8,5 +8,5 @@ export class UserResponseDto extends PickType(UserEntity, [
   'lastName',
   'role',
   'isActive',
-  'createdAt'
+  'createdAt',
 ] as const) {}

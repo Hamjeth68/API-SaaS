@@ -41,7 +41,7 @@ describe('UsersService', () => {
     it('should throw if tenant does not exist', async () => {
       prisma.tenant.findUnique.mockResolvedValue(null);
       await expect(
-        service.create({ tenantId: '1', password: 'pass' } as any)
+        service.create({ tenantId: '1', password: 'pass' } as any),
       ).rejects.toThrow(NotFoundException);
     });
     it('should create a user and return UserResponseDto', async () => {
@@ -69,7 +69,9 @@ describe('UsersService', () => {
         { id: '1', tenantId: '1' },
         { id: '2', tenantId: '1' },
       ]);
-      expect(prisma.user.findMany).toHaveBeenCalledWith({ where: { tenantId: '1' } });
+      expect(prisma.user.findMany).toHaveBeenCalledWith({
+        where: { tenantId: '1' },
+      });
     });
   });
 
@@ -79,7 +81,9 @@ describe('UsersService', () => {
       prisma.user.findUnique.mockResolvedValue(user);
       const result = await service.findOne('1');
       expect(result).toEqual({ id: '1' });
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
     it('should throw NotFoundException if user not found', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
@@ -93,7 +97,9 @@ describe('UsersService', () => {
       prisma.user.findUnique.mockResolvedValue(user);
       const result = await service.findByEmail('test@test.com');
       expect(result).toEqual(user);
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email: 'test@test.com' } });
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: 'test@test.com' },
+      });
     });
   });
 
@@ -136,7 +142,10 @@ describe('UsersService', () => {
       prisma.user.update.mockResolvedValue(user);
       const result = await service.activateUser('1');
       expect(result).toEqual({ id: '1', isActive: true });
-      expect(prisma.user.update).toHaveBeenCalledWith({ where: { id: '1' }, data: { isActive: true } });
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { isActive: true },
+      });
     });
   });
 
@@ -146,7 +155,10 @@ describe('UsersService', () => {
       prisma.user.update.mockResolvedValue(user);
       const result = await service.deactivateUser('1');
       expect(result).toEqual({ id: '1', isActive: false });
-      expect(prisma.user.update).toHaveBeenCalledWith({ where: { id: '1' }, data: { isActive: false } });
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { isActive: false },
+      });
     });
   });
 });

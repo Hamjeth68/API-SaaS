@@ -29,11 +29,17 @@ import {
 } from '@nestjs/swagger';
 import { UserRole } from 'generated/prisma';
 import { TenantResponseDto } from './dto/tenant-response-dto';
-
+/**
+ * TODO: Hamjeth - Fix the JWT token issue here
+ * following all the JWT decorators and guards in every controller is commented out
+ * because the JWT token is not being sent in the request headers.
+ * This is likely due to the fact that the JWT token is not being sent in the request headers.
+ * but we are trying it in swagger and still getting 401 Unauthorized
+ */
 @ApiTags('Tenants')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('tenants')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 

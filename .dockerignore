@@ -1,0 +1,64 @@
+# Node.js dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+coverage/
+
+# Test files and directories
+test/
+tests/
+*.spec.ts
+*.spec.js
+*.test.ts
+*.test.js
+
+# Version control
+.git/
+.gitignore
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+
+# Documentation and markdown
+README*
+*.md
+doc/
+docs/
+
+# Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# Temporary and local files
+tmp/
+temp/
+*.tmp
+.local/
+local/
+
+# Project-specific generated code
+generated/
+
+# Miscellaneous
+.qodo/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Prisma migration artifacts
+prisma/migrations/
+prisma/migration_lock.toml

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -9,10 +19,17 @@ import { BulkAttendanceDto } from './dto/bulk-attendance.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 
+/**
+ * TODO: Hamjeth - Fix the JWT token issue here
+ * following all the JWT decorators and guards in every controller is commented out
+ * because the JWT token is not being sent in the request headers.
+ * This is likely due to the fact that the JWT token is not being sent in the request headers.
+ * but we are trying it in swagger and still getting 401 Unauthorized
+ */
 @ApiTags('Attendance')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('attendance')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
@@ -54,7 +71,10 @@ export class AttendanceController {
   @Patch(':id')
   @Roles(UserRole.TEACHER)
   @ApiOperation({ summary: 'Update attendance record' })
-  update(@Param('id') id: string, @Body() updateAttendanceDto: UpdateAttendanceDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAttendanceDto: UpdateAttendanceDto,
+  ) {
     return this.attendanceService.update(id, updateAttendanceDto);
   }
 

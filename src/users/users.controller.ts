@@ -35,11 +35,17 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
-
+/**
+ * TODO: Hamjeth - Fix the JWT token issue here
+ * following all the JWT decorators and guards in every controller is commented out
+ * because the JWT token is not being sent in the request headers.
+ * This is likely due to the fact that the JWT token is not being sent in the request headers.
+ * but we are trying it in swagger and still getting 401 Unauthorized
+ */
 @ApiTags('Users')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -136,7 +142,8 @@ export class UsersController {
       'application/json': {
         example: {
           statusCode: 404,
-          message: 'Tenant with ID 123e4567-e89b-12d3-a456-426614174000 not found',
+          message:
+            'Tenant with ID 123e4567-e89b-12d3-a456-426614174000 not found',
           error: 'Not Found',
         },
       },
@@ -169,7 +176,9 @@ export class UsersController {
   @ApiForbiddenResponse({
     description: 'Forbidden - User does not have required role',
   })
-  async findAll(@Query('tenantId') tenantId: string): Promise<UserResponseDto[]> {
+  async findAll(
+    @Query('tenantId') tenantId: string,
+  ): Promise<UserResponseDto[]> {
     return this.usersService.findAll(tenantId);
   }
 
@@ -178,7 +187,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get user by ID',
-    description: 'Retrieves a single user by their ID. Requires admin privileges.',
+    description:
+      'Retrieves a single user by their ID. Requires admin privileges.',
   })
   @ApiParam({
     name: 'id',
@@ -337,7 +347,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Activate user',
-    description: 'Activates a deactivated user account. Requires admin privileges.',
+    description:
+      'Activates a deactivated user account. Requires admin privileges.',
   })
   @ApiParam({
     name: 'id',

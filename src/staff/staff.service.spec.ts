@@ -21,7 +21,9 @@ describe('StaffService', () => {
   let prisma: typeof mockPrismaService;
 
   beforeEach(async () => {
-    (uuidv4 as jest.Mock).mockReturnValue('12345678-1234-5678-1234-567812345678');
+    (uuidv4 as jest.Mock).mockReturnValue(
+      '12345678-1234-5678-1234-567812345678',
+    );
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StaffService,
@@ -82,7 +84,10 @@ describe('StaffService', () => {
       const updated = { id: '1', ...dto };
       prisma.staff.update.mockResolvedValue(updated);
       await expect(service.update('1', dto as any)).resolves.toEqual(updated);
-      expect(prisma.staff.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
+      expect(prisma.staff.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: dto,
+      });
     });
   });
 
