@@ -2,21 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // Enable CORS for development
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
-
-  // Use cookie parser middleware
-  app.use(cookieParser());
-
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
@@ -28,11 +21,10 @@ async function bootstrap() {
       },
     }),
   );
-
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('School Management API')
-    .setDescription('The School Management System API documentation')
+    .setTitle('Smart School Management v1.0')
+    .setDescription('REST API for Smart School Management System')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -43,23 +35,19 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth', // This name should match the one used in @ApiBearerAuth()
+      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
     )
-    .addCookieAuth('refresh-token') // If using cookie-based auth
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      persistAuthorization: true, // Persist authorization across reloads
-      tagsSorter: 'alpha', // Sort tags alphabetically
-      operationsSorter: 'alpha', // Sort operations alphabetically
-      docExpansion: 'none', // Collapse all docs by default
+      persistAuthorization: true, // This will persist the authorization token
     },
-    customSiteTitle: 'School Management API Docs',
   });
 
-  await app.listen(process.env.PORT || 3000);
+  app.useGlobalPipes(new ValidationPipe());
+  await app.listen(3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`Swagger docs available at: ${await app.getUrl()}/api`);
 }

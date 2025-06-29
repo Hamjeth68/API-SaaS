@@ -33,9 +33,8 @@ import { StudentsService } from './students.service';
  * but we are trying it in swagger and still getting 401 Unauthorized
  */
 @ApiTags('Students')
-// @ApiBearerAuth()
-@Controller('students')
-// @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')@Controller('students')
+@UseGuards(JwtAuthGuard)
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 

@@ -34,7 +34,7 @@ import { TenantId } from 'src/auth/decorators/tenant.decorator';
 @ApiTags('communications')
 @Controller('communications')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 export class CommunicationsController {
   constructor(private readonly communicationsService: CommunicationsService) {}
 

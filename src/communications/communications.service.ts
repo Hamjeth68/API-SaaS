@@ -46,7 +46,6 @@ export class CommunicationsService {
         scheduledAt: createCommunicationDto.scheduledAt,
         expiresAt: createCommunicationDto.expiresAt,
         authorId: createCommunicationDto.senderId,
-        senderId: createCommunicationDto.senderId,
       };
 
       const communication = await this.prisma.communication.create({
