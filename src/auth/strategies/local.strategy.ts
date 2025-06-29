@@ -1,24 +1,15 @@
+// local.strategy.ts
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { Strategy } from 'passport-jwt';
+import { Strategy as PassportLocalStrategy } from 'passport-local';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(PassportLocalStrategy) {
   constructor(private authService: AuthService) {
     super({
-      jwtFromRequest: (req) => {
-        const token =
-          req?.cookies?.access_token ||
-          req?.headers?.authorization?.split(' ')[1];
-        return token;
-      },
-      ignoreExpiration: false,
-      secretOrKey:
-        process.env.JWT_SECRET ||
-        (() => {
-          throw new Error('JWT_SECRET is not defined');
-        })(),
+      usernameField: 'email',
+      passwordField: 'password',
     });
   }
 

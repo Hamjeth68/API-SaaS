@@ -12,7 +12,6 @@ export async function createUserWithHashedPassword(
     data: {
       ...dto,
       password: hashedPassword,
-      isActive: dto.isActive ?? true,
     },
   });
 }
