@@ -32,9 +32,9 @@ import { UpdateClassDto } from './dto/update-class.dto';
  * but we are trying it in swagger and still getting 401 Unauthorized
  */
 @ApiTags('Classes')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('classes')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 

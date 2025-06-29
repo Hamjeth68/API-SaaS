@@ -1,16 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserResponseDto } from 'src/users/dto/user-response.dto';
+import { User } from '@prisma/client';
 
 export class LoginResponseDto {
   @ApiProperty({
-    description: 'JWT access token',
+    description: 'Access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   access_token: string;
 
   @ApiProperty({
-    description: 'User information',
-    type: UserResponseDto,
+    description: 'Refresh token',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
-  user: UserResponseDto;
+  refresh_token: string;
+
+  @ApiProperty({
+    description: 'User information',
+    type: Object,
+  })
+  user: Omit<User, 'password' | 'refreshToken'>;
 }

@@ -19,9 +19,6 @@ import { BulkAttendanceDto } from './dto/bulk-attendance.dto';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 
-
-
-
 /**
  * TODO: Hamjeth - Fix the JWT token issue here
  * following all the JWT decorators and guards in every controller is commented out
@@ -30,9 +27,9 @@ import { UpdateAttendanceDto } from './dto/update-attendance.dto';
  * but we are trying it in swagger and still getting 401 Unauthorized
  */
 @ApiTags('Attendance')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('attendance')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 

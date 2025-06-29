@@ -37,9 +37,9 @@ import { TenantResponseDto } from './dto/tenant-response-dto';
  * but we are trying it in swagger and still getting 401 Unauthorized
  */
 @ApiTags('Tenants')
-//  @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('tenants')
-//  @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 

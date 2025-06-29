@@ -18,9 +18,9 @@ import { UserRole } from '@prisma/client';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Fees')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('fees')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class FeesController {
   constructor(private readonly feesService: FeesService) {}
 

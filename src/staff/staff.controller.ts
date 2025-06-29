@@ -32,7 +32,7 @@ import { CreateStaffDto } from './dto/create-staff.dto';
  * but we are trying it in swagger and still getting 401 Unauthorized
  */
 @ApiTags('Staff')
-@ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('staff')
 @UseGuards(JwtAuthGuard)
 export class StaffController {

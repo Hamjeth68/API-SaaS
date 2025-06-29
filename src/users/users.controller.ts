@@ -43,9 +43,9 @@ import {
  * but we are trying it in swagger and still getting 401 Unauthorized
  */
 @ApiTags('Users')
-// @ApiBearerAuth()
+@ApiBearerAuth('JWT-auth')
 @Controller('users')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
