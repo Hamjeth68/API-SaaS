@@ -26,7 +26,6 @@ model Tenant {
   address      String?
   logo         String?
   languages    String[] @default(["en"])
-  communications Communication[]
   maxStudents  Int      @default(25)
   subscription String   @default("free")
   timezone     String   @default("Asia/Colombo")
@@ -44,10 +43,25 @@ model Tenant {
   reports         Report[]
   timetables      Timetable[]
   payrolls        Payroll[]
-  chats           Chat[]            // Added missing Chat relation
+  chats           Chat[]
+  communications  Communication[]
+  homeworks       Homework[]
+  homeworkSubmissions HomeworkSubmission[]
+  exams           Exam[]
+  examResults     ExamResult[]
+  libraryBooks    LibraryBook[]
+  bookCheckouts   BookCheckout[]
+  transportRoutes TransportRoute[]
+  vehicles        Vehicle[]
+  hostels         Hostel[]
+  hostelRooms     HostelRoom[]
+  hostelAllocations HostelAllocation[]
+  parentStudents  ParentStudent[]
+  leaveApplications LeaveApplication[]
 
   @@map("tenants")
 }
+
 
 model Chat {
   id           String    @id @default(uuid())
@@ -55,11 +69,10 @@ model Chat {
   tenant       Tenant    @relation(fields: [tenantId], references: [id])
   participants User[]    @relation("ChatParticipants")
   messages     Message[]
-  name         String?   // Optional chat name for group chats
+  name         String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
-
 model Message {
   id        String   @id @default(uuid())
   chatId    String
@@ -72,6 +85,7 @@ model Message {
 }
 
 // Global User model (linked to a specific tenant)
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -92,6 +106,11 @@ model User {
   communicationReads CommunicationRead[]
   chats           Chat[]          @relation("ChatParticipants")
   sentMessages    Message[]
+  homeworkSubmissions HomeworkSubmission[] @relation("UserHomeworkSubmissions")
+  bookCheckouts   BookCheckout[]
+  parentRelations ParentStudent[] @relation("ParentRelations")
+  leaveApplicationsAsApplicant LeaveApplication[] @relation("LeaveApplicationApplicant")
+  leaveApplicationsAsApprover LeaveApplication[] @relation("LeaveApplicationApprover")
 
   @@map("users")
 }
@@ -103,6 +122,9 @@ enum UserRole {
   TEACHER
   PARENT
   STUDENT
+  LIBRARIAN
+  TRANSPORT_MANAGER
+  HOSTEL_MANAGER
 }
 
 enum AttendanceStatus {
@@ -138,13 +160,17 @@ model Student {
   attendances   Attendance[]
   fees          Fee[]
   classStudents ClassStudent[]
+  homeworkSubmissions HomeworkSubmission[]
+  examResults   ExamResult[]
+  hostelAllocations HostelAllocation[]
+  parentStudents ParentStudent[] @relation("StudentParentRelations")
 
   @@map("students")
 }
 
 model Staff {
   id         String   @id @default(uuid())
-  userId     String   @unique // Link to the User who is the staff member
+  userId     String   @unique
   user       User     @relation(fields: [userId], references: [id])
   tenantId   String
   tenant     Tenant   @relation(fields: [tenantId], references: [id])
@@ -158,10 +184,13 @@ model Staff {
   attendances Attendance[]
   classes     Class[]
   payrolls    Payroll[]
+  homeworks   Homework[]
+  vehicles    Vehicle[]
 
   @@unique([staffId, tenantId], map: "staff_id_unique_per_tenant")
   @@index([tenantId])
 }
+
 
 model Class {
   id        String   @id @default(cuid())
@@ -179,6 +208,8 @@ model Class {
   teacher       Staff?        @relation(fields: [teacherId], references: [id])
   attendances   Attendance[]
   classStudents ClassStudent[]
+  homeworks     Homework[]
+  exams         Exam[]
 
   @@map("classes")
 }
@@ -195,6 +226,10 @@ model ClassStudent {
   @@unique([classId, studentId])
   @@index([tenantId])
 }
+
+// -----------------------------------------------------------
+// Attendance Models 
+// -----------------------------------------------------------
 
 model Attendance {
   id        String           @id @default(cuid())
@@ -216,7 +251,9 @@ model Attendance {
   @@unique([studentId, date])
   @@map("attendances")
 }
-
+// -----------------------------------------------------------
+// Communication Models 
+// -----------------------------------------------------------
 model Communication {
   id            String   @id @default(uuid())
   title         String
@@ -240,6 +277,86 @@ model Communication {
   
   @@map("communications")
 }
+
+// -----------------------------------------------------------
+// Fee Models 
+// -----------------------------------------------------------
+model Fee {
+  id          String    @id @default(cuid())
+  amount      Float
+  description String?
+  status      FeeStatus @default(PENDING)
+  dueDate     DateTime
+  paidDate    DateTime?
+  studentId   String
+  tenantId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@map("fees")
+}
+
+
+
+// -----------------------------------------------------------
+// Report  Models 
+// -----------------------------------------------------------
+model Report {
+  id        String   @id @default(uuid())
+  name      String
+  type      String
+  data      Json // Store report data as JSON
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+// -----------------------------------------------------------
+// Timetable  Models 
+// -----------------------------------------------------------
+model Timetable {
+  id        String   @id @default(uuid())
+  name      String // e.g., "Term 1 Timetable"
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  // More specific timetable data (e.g., period, subject, class, teacher) would be in related models or JSON field
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+// -----------------------------------------------------------
+// Payroll  Models 
+// -----------------------------------------------------------
+model Payroll {
+  id        String   @id @default(uuid())
+  staffId   String
+  staff     Staff    @relation(fields: [staffId], references: [id])
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  month     String
+  year      Int
+  amount    Float
+  // Add other payroll specific fields
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([staffId, month, year])
+  @@index([tenantId])
+}
+
+
+
+
+
+
+
 
 model CommunicationRead {
   id               String        @id @default(uuid())
@@ -271,64 +388,284 @@ enum CommunicationPriority {
 
 
 
-model Fee {
-  id          String    @id @default(cuid())
-  amount      Float
-  description String?
-  status      FeeStatus @default(PENDING)
+
+
+
+
+
+
+
+
+
+
+// Extending the existing schema with new models
+model Homework {
+  id          String   @id @default(uuid())
+  title       String
+  description String
   dueDate     DateTime
-  paidDate    DateTime?
-  studentId   String
+  classId     String
+  class       Class    @relation(fields: [classId], references: [id])
+  teacherId   String
+  teacher     Staff    @relation(fields: [teacherId], references: [id])
+  attachments String[]
   tenantId    String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  tenant  Tenant  @relation(fields: [tenantId], references: [id])
-  student Student @relation(fields: [studentId], references: [id])
-
-  @@map("fees")
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  submissions HomeworkSubmission[]
+  
+  @@map("homework")
 }
 
-// Placeholders for future modules
-model Report {
+model HomeworkSubmission {
+  id         String   @id @default(uuid())
+  homeworkId String
+  homework   Homework @relation(fields: [homeworkId], references: [id])
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], name: "UserHomeworkSubmissions")
+  content    String?
+  attachments String[]
+  grade      Float?
+  feedback   String?
+  submittedAt DateTime @default(now())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  
+  @@unique([homeworkId, studentId])
+  @@map("homework_submissions")
+}
+
+model Exam {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  date        DateTime
+  duration    Int
+  classId     String
+  class       Class    @relation(fields: [classId], references: [id])
+  subject     String
+  maxScore    Int      @default(100)
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  results     ExamResult[]
+  
+  @@map("exams")
+}
+
+model ExamResult {
   id        String   @id @default(uuid())
-  name      String
-  type      String
-  data      Json // Store report data as JSON
+  examId    String
+  exam      Exam     @relation(fields: [examId], references: [id])
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  score     Float
+  remarks   String?
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  @@unique([examId, studentId])
+  @@map("exam_results")
+}
+
+// Library Module
+model LibraryBook {
+  id          String   @id @default(uuid())
+  title       String
+  author      String
+  isbn        String?
+  barcode     String   @unique
+  category    String?
+  status      BookStatus @default(AVAILABLE)
+  publishedAt DateTime?
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  checkouts   BookCheckout[]
+  
+  @@map("library_books")
+}
+
+model BookCheckout {
+  id         String   @id @default(uuid())
+  bookId     String
+  book       LibraryBook @relation(fields: [bookId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  checkedOutAt DateTime @default(now())
+  dueDate    DateTime
+  returnedAt DateTime?
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  
+  @@map("book_checkouts")
+}
+
+
+enum BookStatus {
+  AVAILABLE
+  CHECKED_OUT
+  LOST
+  DAMAGED
+}
+
+
+// Transport Module
+model TransportRoute {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  stops       String[]
+  vehicleId   String?
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("transport_routes")
+}
+
+
+model Vehicle {
+  id           String   @id @default(uuid())
+  registration String   @unique
+  type         VehicleType
+  capacity     Int
+  driverId     String?
+  driver       Staff?   @relation(fields: [driverId], references: [id])
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  routes       TransportRoute[]
+  
+  @@map("vehicles")
+}
+
+
+
+enum VehicleType {
+  BUS
+  VAN
+  CAR
+}
+
+// Hostel Module
+model Hostel {
+  id          String   @id @default(uuid())
+  name        String
+  address     String?
+  capacity    Int
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  rooms       HostelRoom[]
+  
+  @@map("hostels")
+}
+model HostelRoom {
+  id        String   @id @default(uuid())
+  hostelId  String
+  hostel    Hostel  @relation(fields: [hostelId], references: [id])
+  number    String
+  capacity  Int
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  allocations HostelAllocation[]
+  
+  @@unique([hostelId, number])
+  @@map("hostel_rooms")
+}
+
+model HostelAllocation {
+  id        String   @id @default(uuid())
+  roomId    String
+  room      HostelRoom @relation(fields: [roomId], references: [id])
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  startDate DateTime
+  endDate   DateTime?
   tenantId  String
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([tenantId])
+  
+  @@unique([studentId], map: "one_allocation_per_student")
+  @@map("hostel_allocations")
 }
 
-model Timetable {
+
+
+// Parent-Student Relationship
+model ParentStudent {
   id        String   @id @default(uuid())
-  name      String // e.g., "Term 1 Timetable"
+  parentId  String
+  parent    User     @relation(fields: [parentId], references: [id], name: "ParentRelations")
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], name: "StudentParentRelations")
+  relation  String   @default("parent")
   tenantId  String
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  // More specific timetable data (e.g., period, subject, class, teacher) would be in related models or JSON field
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([tenantId])
+  
+  @@unique([parentId, studentId])
+  @@map("parent_students")
 }
 
-model Payroll {
-  id        String   @id @default(uuid())
-  staffId   String
-  staff     Staff    @relation(fields: [staffId], references: [id])
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  month     String
-  year      Int
-  amount    Float
-  // Add other payroll specific fields
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([staffId, month, year])
+// Leave Management
+model LeaveApplication {
+  id          String       @id @default(uuid())
+  applicantId String
+  applicant   User         @relation(fields: [applicantId], references: [id], name: "LeaveApplicationApplicant")
+  type        LeaveType
+  startDate   DateTime
+  endDate     DateTime
+  reason      String
+  status      LeaveStatus  @default(PENDING)
+  approvedById String?
+  approvedBy  User?        @relation(fields: [approvedById], references: [id], name: "LeaveApplicationApprover")
+  comments    String?
+  tenantId    String
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@index([applicantId])
+  @@index([approvedById])
   @@index([tenantId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("leave_applications")
+}
+
+enum LeaveType {
+  SICK
+  VACATION
+  PERSONAL
+  MATERNITY
+  PATERNITY
+  OTHER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
 }
