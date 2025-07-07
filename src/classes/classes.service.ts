@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
+import { AssignClassDto } from './dto/assign-class.dto';
 
 @Injectable()
 export class ClassesService {
@@ -23,6 +24,16 @@ export class ClassesService {
             student: true,
           },
         },
+      },
+    });
+  }
+
+  async assignClass(assignClassDto: AssignClassDto) {
+    return this.prisma.classStudent.create({
+      data: {
+        studentId: assignClassDto.studentId,
+        classId: assignClassDto.classId,
+        tenantId: assignClassDto.tenantId,
       },
     });
   }
